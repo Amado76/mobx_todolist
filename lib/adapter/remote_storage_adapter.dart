@@ -1,11 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 sealed class RemoteStorageAdapter {
-  Future<Map<String, dynamic>> getAllCollection(String userId);
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> getAllCollection(
+      String userId);
   Future<void> deleteAllData(String userId);
   Future<void> deleteData({required String userId, required String id});
   Future<DocumentReference> addData(
       {required String userId, required Map<String, dynamic> data});
+  Future<void> updateData(
+      {required String id,
+      required String userId,
+      required Map<String, dynamic> data});
 }
 
 class FirestorageAdapter implements RemoteStorageAdapter {
@@ -13,23 +18,20 @@ class FirestorageAdapter implements RemoteStorageAdapter {
 
   FirestorageAdapter({required this.firestore});
   @override
-  Future<Map<String, dynamic>> getAllCollection(String userId) async {
-    final Map<String, dynamic> fetchedData;
-    final DocumentSnapshot<Map<String, dynamic>> collection =
-        await fetchData(userId);
-
-    fetchedData = collection.data() as Map<String, dynamic>;
-    return fetchedData;
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> getAllCollection(
+      String userId) async {
+    final collection = await firestore.collection(userId).get();
+    return collection.docs;
   }
 
   @override
   Future<void> deleteAllData(String userId) async {
-    await firestore.collection('users').doc(userId).delete();
+    await firestore.collection(userId).doc().delete();
   }
 
   @override
   Future<void> deleteData({required String userId, required String id}) async {
-    final collection = await firestore.collection(userId).get();
+    final collection = await fetchAllData(userId);
     final toDo = collection.docs.firstWhere((element) => element.id == id);
     await toDo.reference.delete();
   }
@@ -42,7 +44,18 @@ class FirestorageAdapter implements RemoteStorageAdapter {
     return savedData;
   }
 
-  fetchData(String userId) async {
-    return await firestore.collection('users').doc(userId).get();
+  @override
+  Future<void> updateData(
+      {required String id,
+      required String userId,
+      required Map<String, dynamic> data}) async {
+    final collection = await fetchAllData(userId);
+    final toDo = collection.docs.firstWhere((element) => element.id == id);
+    await toDo.reference.update(data);
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> fetchAllData(
+      String userId) async {
+    return await firestore.collection(userId).get();
   }
 }

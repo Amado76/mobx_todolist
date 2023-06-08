@@ -18,6 +18,10 @@ sealed class IToDoRepository {
       {required ToDoDto toDoDto,
       required String userId,
       required List<ToDoStore> toDoList});
+  Future<void> updateData(
+      {required ToDoStore toDo,
+      required String userId,
+      required Map<String, dynamic> data});
 }
 
 class ToDoRepository extends IToDoRepository {
@@ -25,21 +29,20 @@ class ToDoRepository extends IToDoRepository {
 
   @override
   Future<List<ToDoStore>> getAllCollection(String userId) async {
-    List<ToDoStore> fetchedData;
-    final Map<String, dynamic> collection =
-        await remoteStorageAdapter.getAllCollection(userId);
+    List<ToDoStore> toDoList;
+    final collection = await remoteStorageAdapter.getAllCollection(userId);
 
-    fetchedData = {
-      for (var entry in collection.entries)
-        entry.key: ToDoStore(
-          id: entry.key,
-          creationDate: entry.value['creationDate'],
-          title: entry.value['title'],
-          content: entry.value['content'],
-          isDone: entry.value['isDone'],
-        )
-    }.values.toList();
-    return fetchedData;
+    toDoList = collection
+        .map((doc) => ToDoStore(
+              id: doc.id,
+              creationDate:
+                  DateTime.parse(doc[_ToDoKeys.creationDate] as String),
+              title: doc[_ToDoKeys.title] as String,
+              content: doc[_ToDoKeys.content] as String,
+              isDone: doc[_ToDoKeys.isDone] as bool,
+            ))
+        .toList();
+    return toDoList;
   }
 
   @override
@@ -76,6 +79,15 @@ class ToDoRepository extends IToDoRepository {
       _ToDoKeys.isDone: toDoDto.isDone,
     };
     return await remoteStorageAdapter.addData(userId: userId, data: data);
+  }
+
+  @override
+  Future<void> updateData(
+      {required ToDoStore toDo,
+      required String userId,
+      required Map<String, dynamic> data}) async {
+    await remoteStorageAdapter.updateData(
+        id: toDo.id, userId: userId, data: data);
   }
 }
 

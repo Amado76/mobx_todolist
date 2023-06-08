@@ -123,6 +123,24 @@ mixin _$AppState on _AppState, Store {
     return _$logoutAsyncAction.run(() => super.logout());
   }
 
+  late final _$loginInAsyncAction =
+      AsyncAction('_AppState.loginIn', context: context);
+
+  @override
+  Future<bool> loginIn({required String email, required String password}) {
+    return _$loginInAsyncAction
+        .run(() => super.loginIn(email: email, password: password));
+  }
+
+  late final _$registerUserAsyncAction =
+      AsyncAction('_AppState.registerUser', context: context);
+
+  @override
+  Future<bool> registerUser({required String email, required String password}) {
+    return _$registerUserAsyncAction
+        .run(() => super.registerUser(email: email, password: password));
+  }
+
   late final _$createToDoAsyncAction =
       AsyncAction('_AppState.createToDo', context: context);
 
@@ -130,6 +148,49 @@ mixin _$AppState on _AppState, Store {
   Future<bool> createToDo({required String title, required String content}) {
     return _$createToDoAsyncAction
         .run(() => super.createToDo(title: title, content: content));
+  }
+
+  late final _$modifyIsDoneAsyncAction =
+      AsyncAction('_AppState.modifyIsDone', context: context);
+
+  @override
+  Future<bool> modifyIsDone(ToDoStore toDo, {required bool isDone}) {
+    return _$modifyIsDoneAsyncAction
+        .run(() => super.modifyIsDone(toDo, isDone: isDone));
+  }
+
+  late final _$modifyTitleAsyncAction =
+      AsyncAction('_AppState.modifyTitle', context: context);
+
+  @override
+  Future<bool> modifyTitle(ToDoStore toDo, {required String title}) {
+    return _$modifyTitleAsyncAction
+        .run(() => super.modifyTitle(toDo, title: title));
+  }
+
+  late final _$modifyContentAsyncAction =
+      AsyncAction('_AppState.modifyContent', context: context);
+
+  @override
+  Future<bool> modifyContent(ToDoStore toDo, {required String content}) {
+    return _$modifyContentAsyncAction
+        .run(() => super.modifyContent(toDo, content: content));
+  }
+
+  late final _$initializeAsyncAction =
+      AsyncAction('_AppState.initialize', context: context);
+
+  @override
+  Future<void> initialize() {
+    return _$initializeAsyncAction.run(() => super.initialize());
+  }
+
+  late final _$_loadToDoListAsyncAction =
+      AsyncAction('_AppState._loadToDoList', context: context);
+
+  @override
+  Future<bool> _loadToDoList() {
+    return _$_loadToDoListAsyncAction.run(() => super._loadToDoList());
   }
 
   late final _$_AppStateActionController =

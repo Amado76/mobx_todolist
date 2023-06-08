@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
@@ -44,6 +46,13 @@ abstract class _AppState with Store {
   ObservableList<ToDoStore> get sortedReminderList =>
       toDoList.sorted().asObservable();
 
+  ({bool isLogged, String? userId}) isUserLogged() {
+    if (currentUser == null) {
+      return (isLogged: false, userId: null);
+    }
+    return (isLogged: true, userId: currentUser!.userId);
+  }
+
   @action
   void goTo(AppScreen screen) {
     currentScreen = screen;
@@ -51,19 +60,15 @@ abstract class _AppState with Store {
 
   @action
   Future<bool> delete(ToDoStore toDo) async {
-    isLoading = true;
-
-    bool isUserLogged = await authUserRepository.isUserLoggedIn();
-    if (isUserLogged == false) {
-      isLoading = false;
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
       return false;
     }
-
-    AuthUser user = await authUserRepository.getLoggedUser();
-
+    isLoading = true;
+    String userId = userLogged.userId!;
     try {
       await toDoRepository.deleteDataFromRemoteStorage(
-          userId: user.userId, toDo: toDo);
+          userId: userId, toDo: toDo);
       toDoList.removeWhere(((element) => element.id == toDo.id));
       return true;
     } catch (_) {
@@ -75,16 +80,15 @@ abstract class _AppState with Store {
 
   @action
   Future<bool> deleteAccount(String email, String password) async {
-    isLoading = true;
-    bool isUserLogged = await authUserRepository.isUserLoggedIn();
-    if (isUserLogged == false) {
-      isLoading = false;
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
       return false;
     }
-    AuthUser user = await authUserRepository.getLoggedUser();
+    isLoading = true;
+    String userId = userLogged.userId!;
 
     try {
-      await toDoRepository.deleteAllDataFromRemoteStorage(user.userId);
+      await toDoRepository.deleteAllDataFromRemoteStorage(userId);
       await authUserRepository.deleteAccount(email: email, password: password);
       await authUserRepository.logout();
       currentScreen = AppScreen.login;
@@ -107,14 +111,55 @@ abstract class _AppState with Store {
   }
 
   @action
+  Future<bool> loginIn(
+      {required String email, required String password}) async {
+    isLoading = true;
+
+    try {
+      currentUser =
+          await authUserRepository.login(email: email, password: password);
+      await _loadToDoList();
+      isLoading = false;
+      currentScreen = AppScreen.toDoList;
+      return true;
+    } on Exception catch (e) {
+      authError = AuthError.from(e);
+      currentUser = null;
+      return false;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<bool> registerUser(
+      {required String email, required String password}) async {
+    isLoading = true;
+    try {
+      currentUser =
+          await authUserRepository.register(email: email, password: password);
+      await _loadToDoList();
+      isLoading = false;
+      currentScreen = AppScreen.toDoList;
+      return true;
+    } on Exception catch (e) {
+      authError = AuthError.from(e);
+      currentUser = null;
+      return false;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
   Future<bool> createToDo(
       {required String title, required String content}) async {
-    isLoading = true;
-    final userId = currentUser?.userId;
-    if (userId == null) {
-      isLoading = false;
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
       return false;
     }
+    isLoading = true;
+    String userId = userLogged.userId!;
     final creationDate = DateTime.now();
     ToDoDto toDoDto = ToDoDto(
         creationDate: creationDate,
@@ -131,6 +176,104 @@ abstract class _AppState with Store {
       return false;
     } finally {
       isLoading = false;
+    }
+  }
+
+  @action
+  Future<bool> modifyIsDone(ToDoStore toDo, {required bool isDone}) async {
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
+      return false;
+    }
+    isLoading = true;
+    String userId = userLogged.userId!;
+
+    try {
+      await toDoRepository
+          .updateData(toDo: toDo, userId: userId, data: {'isDone': isDone});
+      toDoList.firstWhere((element) => element.id == toDo.id).isDone = isDone;
+      isLoading = false;
+      return true;
+    } on Exception catch (_) {
+      return false;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<bool> modifyTitle(ToDoStore toDo, {required String title}) async {
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
+      return false;
+    }
+    isLoading = true;
+    String userId = userLogged.userId!;
+
+    try {
+      await toDoRepository
+          .updateData(toDo: toDo, userId: userId, data: {'title': title});
+      toDoList.firstWhere((element) => element.id == toDo.id).title = title;
+      isLoading = false;
+      return true;
+    } on Exception catch (_) {
+      return false;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<bool> modifyContent(ToDoStore toDo, {required String content}) async {
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
+      return false;
+    }
+    isLoading = true;
+    String userId = userLogged.userId!;
+
+    try {
+      await toDoRepository
+          .updateData(toDo: toDo, userId: userId, data: {'content': content});
+      toDoList.firstWhere((element) => element.id == toDo.id).content = content;
+      isLoading = false;
+      return true;
+    } on Exception catch (_) {
+      return false;
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<void> initialize() async {
+    isLoading = true;
+    bool isUserLogged = await authUserRepository.isUserLoggedIn();
+    if (!isUserLogged) {
+      isLoading = false;
+      currentScreen = AppScreen.login;
+      currentUser = null;
+      return;
+    }
+    currentUser = await authUserRepository.getLoggedUser();
+    _loadToDoList();
+    currentScreen = AppScreen.toDoList;
+    isLoading = false;
+  }
+
+  @action
+  Future<bool> _loadToDoList() async {
+    ({bool isLogged, String? userId}) userLogged = isUserLogged();
+    if (!userLogged.isLogged) {
+      return false;
+    }
+    String userId = userLogged.userId!;
+    try {
+      final toDoList = await toDoRepository.getAllCollection(userId);
+      this.toDoList = ObservableList.of(toDoList);
+      return true;
+    } on Exception catch (_) {
+      return false;
     }
   }
 }

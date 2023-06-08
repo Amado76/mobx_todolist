@@ -18,8 +18,8 @@ Map<String, AuthError> authErrorMapping = {
   'email-already-in-use': const AuthErrorEmailAlreadyExists(),
   'too-many-requests': const AuthErrorTooManyRequests(),
   'Exception: invalid-social-network': const AuthErrorOperationNotAllowed(),
-  'network_error': AuthErrorNetworkError(),
-  'network-request-failed': AuthErrorNetworkError(),
+  'network_error': const AuthErrorNetworkError(),
+  'network-request-failed': const AuthErrorNetworkError(),
 };
 
 @immutable
