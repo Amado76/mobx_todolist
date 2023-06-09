@@ -29,6 +29,13 @@
             {
               "client_id": "902970468462-md7fcb0p9nehutk1bqlk851hdhahcus2.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "902970468462-e016h7skm40v5hcgtnj68ufrqnqv79ep.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mobxTodolist"
+              }
             }
           ]
         }

@@ -123,13 +123,13 @@ mixin _$AppState on _AppState, Store {
     return _$logoutAsyncAction.run(() => super.logout());
   }
 
-  late final _$loginInAsyncAction =
-      AsyncAction('_AppState.loginIn', context: context);
+  late final _$loginAsyncAction =
+      AsyncAction('_AppState.login', context: context);
 
   @override
-  Future<bool> loginIn({required String email, required String password}) {
-    return _$loginInAsyncAction
-        .run(() => super.loginIn(email: email, password: password));
+  Future<bool> login({required String email, required String password}) {
+    return _$loginAsyncAction
+        .run(() => super.login(email: email, password: password));
   }
 
   late final _$registerUserAsyncAction =

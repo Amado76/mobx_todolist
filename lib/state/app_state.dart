@@ -111,8 +111,7 @@ abstract class _AppState with Store {
   }
 
   @action
-  Future<bool> loginIn(
-      {required String email, required String password}) async {
+  Future<bool> login({required String email, required String password}) async {
     isLoading = true;
 
     try {
