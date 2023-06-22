@@ -1,5 +1,5 @@
 import 'package:mobx_todolist/adapter/auth_adapter.dart';
-import 'package:mobx_todolist/store/auth_user_store.dart';
+import 'package:mobx_todolist/store/auth_user_model.dart';
 
 sealed class IAuthUserRepository {
   final IAuthAdapter authAdapter;

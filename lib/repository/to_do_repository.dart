@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart' show DocumentReference;
+import 'package:cloud_firestore/cloud_firestore.dart'
+    show DocumentReference, Timestamp;
 import 'package:mobx_todolist/store/to_do_store.dart';
 import 'package:mobx_todolist/util/to_do_dto.dart';
 
@@ -35,8 +36,7 @@ class ToDoRepository extends IToDoRepository {
     toDoList = collection
         .map((doc) => ToDoStore(
               id: doc.id,
-              creationDate:
-                  DateTime.parse(doc[_ToDoKeys.creationDate] as String),
+              creationDate: (doc[_ToDoKeys.creationDate] as Timestamp).toDate(),
               title: doc[_ToDoKeys.title] as String,
               content: doc[_ToDoKeys.content] as String,
               isDone: doc[_ToDoKeys.isDone] as bool,

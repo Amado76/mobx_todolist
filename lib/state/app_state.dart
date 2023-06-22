@@ -9,7 +9,7 @@ import 'package:mobx_todolist/adapter/remote_storage_adapter.dart';
 import 'package:mobx_todolist/custom_extensions.dart';
 import 'package:mobx_todolist/repository/auth_user_repository.dart';
 import 'package:mobx_todolist/repository/to_do_repository.dart';
-import 'package:mobx_todolist/store/auth_user_store.dart';
+import 'package:mobx_todolist/store/auth_user_model.dart';
 import 'package:mobx_todolist/store/to_do_store.dart';
 import 'package:mobx_todolist/util/auth_error.dart';
 import 'package:mobx_todolist/util/to_do_dto.dart';
@@ -43,7 +43,7 @@ abstract class _AppState with Store {
   ObservableList<ToDoStore> toDoList = ObservableList<ToDoStore>();
 
   @computed
-  ObservableList<ToDoStore> get sortedReminderList =>
+  ObservableList<ToDoStore> get sortedToDoListList =>
       toDoList.sorted().asObservable();
 
   ({bool isLogged, String? userId}) isUserLogged() {
@@ -56,6 +56,11 @@ abstract class _AppState with Store {
   @action
   void goTo(AppScreen screen) {
     currentScreen = screen;
+  }
+
+  @action
+  void resetAuthError() {
+    authError = null;
   }
 
   @action
@@ -124,6 +129,7 @@ abstract class _AppState with Store {
     } on Exception catch (e) {
       authError = AuthError.from(e);
       currentUser = null;
+
       return false;
     } finally {
       isLoading = false;

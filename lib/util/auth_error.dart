@@ -97,8 +97,8 @@ class AuthErrorTokenExpired extends AuthError {
 class AuthErrorTokenRevoked extends AuthError {
   const AuthErrorTokenRevoked()
       : super(
-          dialogTitle: "Invalid Email",
-          dialogText: "Please enter a valid email address!",
+          dialogTitle: "Session Expired",
+          dialogText: "Your session has expired. Please sign in again!",
         );
   @override
   List<Object?> get props => [super.dialogText, super.dialogTitle];
@@ -109,8 +109,8 @@ class AuthErrorTokenRevoked extends AuthError {
 class AuthErrorInvalidEmail extends AuthError {
   const AuthErrorInvalidEmail()
       : super(
-          dialogTitle: "Operation not allowed",
-          dialogText: "You cannot register using this method at this moment!",
+          dialogTitle: "Invalid Emai",
+          dialogText: "Please enter a valid email address!",
         );
   @override
   List<Object?> get props => [super.dialogText, super.dialogTitle];

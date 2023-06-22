@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mobx_todolist/state/app_state.dart';
 import 'package:provider/provider.dart';
 
-class RegisterView extends StatefulWidget {
-  const RegisterView({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<RegisterView> createState() => _RegisterViewState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterViewState extends State<RegisterView> {
+class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();

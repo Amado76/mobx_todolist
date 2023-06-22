@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart' show BuildContext;
 import 'package:mobx_todolist/widgets/dialogs/generic_dialog.dart';
 
-Future<bool> showDeleteReminderDialog(BuildContext context) {
+Future<bool> showDeleteToDoDialog(BuildContext context) {
   return showGenericDialog<bool>(
     context: context,
-    title: 'Delete reminder',
+    title: 'Delete To Do',
     content:
-        'Are you sure you want to delete this reminder? You cannot undo this action!',
+        'Are you sure you want to delete this to do? You cannot undo this action!',
     optionsBuilder: () => {
       'Cancel': false,
       'Delete': true,

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:mobx_todolist/store/auth_user_store.dart';
+import 'package:mobx_todolist/store/auth_user_model.dart';
 
 sealed class IAuthAdapter {
   Future<AuthUser> login({required String email, required String password});

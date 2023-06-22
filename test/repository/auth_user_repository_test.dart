@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobx_todolist/adapter/auth_adapter.dart';
 import 'package:mobx_todolist/repository/auth_user_repository.dart';
-import 'package:mobx_todolist/store/auth_user_store.dart';
+import 'package:mobx_todolist/store/auth_user_model.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../mocks/auth_user_mock.dart';

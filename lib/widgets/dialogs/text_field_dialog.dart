@@ -4,26 +4,43 @@ enum TextFieldDialogButtonType { cancel, confirm }
 
 typedef DialogOptionBuilder = Map<TextFieldDialogButtonType, String> Function();
 
-final controller = TextEditingController();
+final titleController = TextEditingController();
+final contentController = TextEditingController();
 
-Future<String?> showTextFieldDialog({
+Future<List<String?>?> showTextFieldDialog({
   required BuildContext context,
   required String title,
-  required String? hintText,
+  required String? hintTitleText,
+  required String? hintContentText,
   required DialogOptionBuilder optionsBuilder,
 }) {
-  controller.clear();
+  titleController.clear();
   final options = optionsBuilder();
-  return showDialog<String?>(
+  return showDialog<List<String?>>(
+    barrierDismissible: false,
     context: context,
     builder: (context) {
       return AlertDialog(
         title: Text(title),
-        content: TextField(
-          autofocus: true,
-          controller: controller,
-          decoration: InputDecoration(
-            hintText: hintText,
+        content: SizedBox(
+          height: 100,
+          child: Column(
+            children: [
+              TextField(
+                autofocus: true,
+                controller: titleController,
+                decoration: InputDecoration(
+                  hintText: hintTitleText,
+                ),
+              ),
+              TextField(
+                autofocus: false,
+                controller: contentController,
+                decoration: InputDecoration(
+                  hintText: hintContentText,
+                ),
+              ),
+            ],
           ),
         ),
         actions: options.entries.map(
@@ -32,10 +49,19 @@ Future<String?> showTextFieldDialog({
               onPressed: () {
                 switch (option.key) {
                   case TextFieldDialogButtonType.cancel:
+                    titleController.clear();
+                    contentController.clear();
                     Navigator.of(context).pop();
                     break;
                   case TextFieldDialogButtonType.confirm:
-                    Navigator.of(context).pop(controller.text);
+                    List<String?> list = [
+                      titleController.text,
+                      contentController.text
+                    ];
+                    titleController.clear();
+                    contentController.clear();
+                    Navigator.of(context).pop(list);
+
                     break;
                 }
               },

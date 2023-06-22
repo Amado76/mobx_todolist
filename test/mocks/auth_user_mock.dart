@@ -1,4 +1,4 @@
-import 'package:mobx_todolist/store/auth_user_store.dart';
+import 'package:mobx_todolist/store/auth_user_model.dart';
 import 'package:mocktail/mocktail.dart';
 
 class AuthUserMock extends Mock implements AuthUser {
