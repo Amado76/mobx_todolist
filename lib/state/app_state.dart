@@ -118,6 +118,7 @@ abstract class _AppState with Store {
   @action
   Future<bool> login({required String email, required String password}) async {
     isLoading = true;
+    resetAuthError();
 
     try {
       currentUser =
@@ -140,6 +141,7 @@ abstract class _AppState with Store {
   Future<bool> registerUser(
       {required String email, required String password}) async {
     isLoading = true;
+    resetAuthError();
     try {
       currentUser =
           await authUserRepository.register(email: email, password: password);
@@ -161,8 +163,10 @@ abstract class _AppState with Store {
       {required String title, required String content}) async {
     ({bool isLogged, String? userId}) userLogged = isUserLogged();
     if (!userLogged.isLogged) {
+      resetAuthError();
       return false;
     }
+    resetAuthError();
     isLoading = true;
     String userId = userLogged.userId!;
     final creationDate = DateTime.now();
@@ -188,8 +192,10 @@ abstract class _AppState with Store {
   Future<bool> modifyIsDone(ToDoStore toDo, {required bool isDone}) async {
     ({bool isLogged, String? userId}) userLogged = isUserLogged();
     if (!userLogged.isLogged) {
+      resetAuthError();
       return false;
     }
+    resetAuthError();
     isLoading = true;
     String userId = userLogged.userId!;
 
@@ -210,8 +216,10 @@ abstract class _AppState with Store {
   Future<bool> modifyTitle(ToDoStore toDo, {required String title}) async {
     ({bool isLogged, String? userId}) userLogged = isUserLogged();
     if (!userLogged.isLogged) {
+      resetAuthError();
       return false;
     }
+    resetAuthError();
     isLoading = true;
     String userId = userLogged.userId!;
 
@@ -232,8 +240,10 @@ abstract class _AppState with Store {
   Future<bool> modifyContent(ToDoStore toDo, {required String content}) async {
     ({bool isLogged, String? userId}) userLogged = isUserLogged();
     if (!userLogged.isLogged) {
+      resetAuthError();
       return false;
     }
+    resetAuthError();
     isLoading = true;
     String userId = userLogged.userId!;
 
@@ -252,6 +262,7 @@ abstract class _AppState with Store {
 
   @action
   Future<void> initialize() async {
+    resetAuthError();
     isLoading = true;
     bool isUserLogged = await authUserRepository.isUserLoggedIn();
     if (!isUserLogged) {
@@ -268,6 +279,7 @@ abstract class _AppState with Store {
 
   @action
   Future<bool> _loadToDoList() async {
+    resetAuthError();
     ({bool isLogged, String? userId}) userLogged = isUserLogged();
     if (!userLogged.isLogged) {
       return false;

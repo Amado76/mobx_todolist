@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Provider(
-      create: (_) => AppState(),
+      create: (_) => AppState()..initialize(),
       builder: (context, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -44,8 +44,6 @@ class MyApp extends StatelessWidget {
               AuthError? authError = context.read<AppState>().authError;
               if (authError != null) {
                 showAuthError(authError: authError, context: context);
-                context.watch<AppState>().resetAuthError();
-                authError = context.read<AppState>().authError;
               }
             });
           },

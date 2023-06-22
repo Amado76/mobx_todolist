@@ -20,23 +20,25 @@ class ToDoListPageState extends State<ToDoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         title: const Text('To Do List'),
         actions: [
           IconButton(
               onPressed: () async {
-                final List<String?>? toDoText = await showTextFieldDialog(
-                    context: context,
-                    title: "Add a new To Do",
-                    hintTitleText: "Enter your To Do here",
-                    hintContentText: "Enter the description here",
-                    optionsBuilder: () => {
-                          TextFieldDialogButtonType.cancel: "Cancel",
-                          TextFieldDialogButtonType.confirm: "Add",
-                        });
+                final Map<String, String?>? toDoText =
+                    await showTextFieldDialog(
+                        context: context,
+                        autoFocus: true,
+                        title: "Add a new To Do",
+                        hintTitleText: "Enter your To Do here",
+                        hintContentText: "Enter the description here",
+                        optionsBuilder: () => {
+                              TextFieldDialogButtonType.cancel: "Cancel",
+                              TextFieldDialogButtonType.confirm: "Add",
+                            });
                 if (toDoText == null || toDoText.isEmpty) return;
-                context
-                    .read<AppState>()
-                    .createToDo(title: toDoText[0]!, content: toDoText[1]!);
+                context.read<AppState>().createToDo(
+                    title: toDoText['title']!, content: toDoText['content']!);
               },
               icon: const Icon(Icons.add)),
           const MainPopupMenuButton(),
@@ -59,29 +61,75 @@ class ToDoListView extends StatelessWidget {
             itemCount: appState.sortedToDoListList.length,
             itemBuilder: (context, index) {
               final toDo = appState.sortedToDoListList[index];
-              return CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                value: toDo.isDone,
-                onChanged: (isDone) {
-                  context
-                      .read<AppState>()
-                      .modifyIsDone(toDo, isDone: isDone ?? false);
-                  toDo.isDone = isDone ?? false;
-                },
-                title: Row(children: [
-                  Expanded(
-                    child: Text(toDo.title),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final shouldDelete = await showDeleteToDoDialog(context);
-                      if (shouldDelete) {
-                        context.read<AppState>().delete(toDo);
-                      }
-                    },
-                    icon: const Icon(Icons.delete_forever),
-                  ),
-                ]),
+              return Observer(
+                builder: (context) => CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: toDo.isDone,
+                  onChanged: (isDone) {
+                    context
+                        .read<AppState>()
+                        .modifyIsDone(toDo, isDone: isDone ?? false);
+                    toDo.isDone = isDone ?? false;
+                  },
+                  title: Row(children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            toDo.title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                          Text(
+                            toDo.content,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        final Map<String, String?>? toDoText =
+                            await showTextFieldDialog(
+                                context: context,
+                                title: "Edit To Do",
+                                hintTitleText: "Edit Title",
+                                defaultTitle: toDo.title,
+                                hintContentText: "Edit Content",
+                                defaultContent: toDo.content,
+                                optionsBuilder: () => {
+                                      TextFieldDialogButtonType.cancel:
+                                          "Cancel",
+                                      TextFieldDialogButtonType.confirm: "Add",
+                                    });
+                        if (toDoText == null || toDoText.isEmpty) return;
+                        if (toDoText['title']!.isNotEmpty) {
+                          context.read<AppState>().modifyTitle(
+                                toDo,
+                                title: toDoText['title']!,
+                              );
+                        }
+
+                        context
+                            .read<AppState>()
+                            .modifyContent(toDo, content: toDoText['content']!);
+                      },
+                      icon: const Icon(Icons.edit),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        final shouldDelete =
+                            await showDeleteToDoDialog(context);
+                        if (shouldDelete) {
+                          context.read<AppState>().delete(toDo);
+                        }
+                      },
+                      icon: const Icon(Icons.delete_forever),
+                    ),
+                  ]),
+                ),
               );
             });
       },

@@ -4,19 +4,22 @@ enum TextFieldDialogButtonType { cancel, confirm }
 
 typedef DialogOptionBuilder = Map<TextFieldDialogButtonType, String> Function();
 
-final titleController = TextEditingController();
-final contentController = TextEditingController();
-
-Future<List<String?>?> showTextFieldDialog({
+Future<Map<String, String?>?> showTextFieldDialog({
   required BuildContext context,
   required String title,
   required String? hintTitleText,
   required String? hintContentText,
   required DialogOptionBuilder optionsBuilder,
+  String? defaultTitle,
+  String? defaultContent,
+  bool autoFocus = false,
 }) {
-  titleController.clear();
+  final titleController = TextEditingController(text: defaultTitle);
+  final contentController = TextEditingController(text: defaultContent);
+
   final options = optionsBuilder();
-  return showDialog<List<String?>>(
+
+  return showDialog<Map<String, String?>?>(
     barrierDismissible: false,
     context: context,
     builder: (context) {
@@ -27,7 +30,7 @@ Future<List<String?>?> showTextFieldDialog({
           child: Column(
             children: [
               TextField(
-                autofocus: true,
+                autofocus: autoFocus,
                 controller: titleController,
                 decoration: InputDecoration(
                   hintText: hintTitleText,
@@ -54,13 +57,13 @@ Future<List<String?>?> showTextFieldDialog({
                     Navigator.of(context).pop();
                     break;
                   case TextFieldDialogButtonType.confirm:
-                    List<String?> list = [
-                      titleController.text,
-                      contentController.text
-                    ];
+                    Map<String, String?>? map = {
+                      'title': titleController.text,
+                      'content': contentController.text
+                    };
                     titleController.clear();
                     contentController.clear();
-                    Navigator.of(context).pop(list);
+                    Navigator.of(context).pop(map);
 
                     break;
                 }

@@ -8,6 +8,7 @@ class ToDoStore = _ToDoStore with _$ToDoStore;
 abstract class _ToDoStore with Store {
   final String id;
   final DateTime creationDate;
+
   @observable
   String title;
   @observable
